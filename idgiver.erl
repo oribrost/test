@@ -34,8 +34,9 @@ terminate(_,_) -> ok.
 code_change(_,State,_) -> {ok, State}.
 
 host_name() ->
-	{_, X} = inet:gethostname(), 
-	X.
+    {_, X} = inet:gethostname(),
+    io:format("~nhost_name~n~p nodes ~p~n",[X,node()]), 
+    X.
 
 get() ->
 	gen_server:call({idgiver, list_to_atom("idgiver@" ++ host_name())}, {get}).
