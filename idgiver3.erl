@@ -10,14 +10,14 @@
 
 init(Mode) ->
     case Mode of
-	random->
+	sequential->
 	    io:format("init as random~n"),
 	    crypto:start(),
-	    {ok, {random, 0}};
-	sequential->
+	    {ok, {sequential, 0}};
+	random->
 	    io:format("init as sequential~n"),
 	    crypto:start(),
-	    {ok, {sequential, sets:new()}}
+	    {ok, {random, sets:new()}}
     end.
  
 
@@ -54,10 +54,10 @@ get_random_not_in_set(Set) ->
 
 handle_call({get}, From, {Mode, State}) ->
     case Mode of
-	sequential->
+	random->
 	    X = get_random_not_in_set(State),
 	    {reply, X, {Mode, sets:add_element(X, State)}};
-	random->
+	sequential->
 	    Reply = State + crypto:rand_uniform(0, 19401940194) * 27852785, 
 	    io:format("Counter is ~p~n", [State]),
 	    case State rem 2 of 
