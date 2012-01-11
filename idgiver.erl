@@ -6,29 +6,28 @@
 -export([get/0]).
 -define (MOD, 'idgiver').
 
-
 init(_) ->
-	crypto:start(),
-	{ok, 0}.
+    crypto:start(),
+    {ok, 0}.
 
 start() ->
     net_kernel:start([?MOD, shortnames]),
     gen_server:start_link({local,idgiver}, idgiver, [], []).
 
 handle_call({get}, From, Counter) ->
-	Reply = Counter + crypto:rand_uniform(0, 19401940194) * 27852785, 
-	io:format("Counter is ~p~n", [Counter]),
-	case Counter rem 2 of 
-		0 -> proc_lib:spawn_link(fun() -> 
-										 timer:sleep(4000), 
-										 gen_server:reply(From, Reply)
-								 end);
-		1 -> proc_lib:spawn_link(fun() -> 
-										 timer:sleep(2000),
-										 gen_server:reply(From, Reply)
-								 end)
-	end,
-	{noreply, Counter + 1}.
+    Reply = Counter + crypto:rand_uniform(0, 19401940194) * 27852785, 
+    io:format("Counter is ~p~n", [Counter]),
+    case Counter rem 2 of 
+	0 -> proc_lib:spawn_link(fun() -> 
+					 timer:sleep(4000), 
+					 gen_server:reply(From, Reply)
+				 end);
+	1 -> proc_lib:spawn_link(fun() -> 
+					 timer:sleep(2000),
+					 gen_server:reply(From, Reply)
+				 end)
+    end,
+    {noreply, Counter + 1}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Msg, State) -> {noreply, State}.
@@ -37,9 +36,8 @@ code_change(_,State,_) -> {ok, State}.
 
 host_name() ->
     {_, X} = inet:gethostname(),
-    io:format("~nhost_name~n~p nodes ~p~n",[X,node()]), 
     X.
 
 get() ->
-	gen_server:call({idgiver, list_to_atom("idgiver@" ++ host_name())}, {get}).
+    gen_server:call({idgiver, list_to_atom("idgiver@" ++ host_name())}, {get}).
 

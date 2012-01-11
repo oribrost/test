@@ -11,11 +11,9 @@
 init(Mode) ->
     case Mode of
 	sequential->
-	    io:format("init as random~n"),
 	    crypto:start(),
 	    {ok, {sequential, 0}};
 	random->
-	    io:format("init as sequential~n"),
 	    crypto:start(),
 	    {ok, {random, sets:new()}}
     end.
@@ -25,10 +23,8 @@ start(Mode) ->
     net_kernel:start([idgiver3, shortnames]),
     case Mode of
 	random ->
-	    io:format("starts as random~n"),
 	    gen_server:start_link({local,idgiver3}, idgiver3, Mode, []);
 	sequential ->
-	    io:format("starts as sequential~n"),
 	    gen_server:start_link({local,idgiver3}, idgiver3, Mode, []);
 	_ ->
 	    io:format("Bad argument to start function, enter 'random' for idgiver mode or 'sequential' for idgiver2 mode.")
@@ -58,8 +54,7 @@ handle_call({get}, From, {Mode, State}) ->
 	    X = get_random_not_in_set(State),
 	    {reply, X, {Mode, sets:add_element(X, State)}};
 	sequential->
-	    Reply = State + crypto:rand_uniform(0, 19401940194) * 27852785, 
-	    io:format("Counter is ~p~n", [State]),
+	    Reply = State, 
 	    case State rem 2 of 
 		0 -> proc_lib:spawn_link(fun() -> 
 						 timer:sleep(4000), 
