@@ -5,7 +5,6 @@
 		code_change/3]).
 -export([get/0]).
 
-
 init(_) ->
 	crypto:start(),
 	{ok, sets:new()}.
@@ -40,5 +39,6 @@ host_name() ->
 	X.
 
 get() ->
+    io:format("~nget sequential ~p~n", [ list_to_atom("idgiver2@" ++ host_name())]),
 	gen_server:call({idgiver2, list_to_atom("idgiver2@" ++ host_name())}, {get}).
 

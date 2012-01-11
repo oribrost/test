@@ -4,6 +4,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
 		code_change/3]).
 -export([get/0]).
+-define (MOD, 'idgiver').
 
 
 init(_) ->
@@ -11,7 +12,8 @@ init(_) ->
 	{ok, 0}.
 
 start() ->
-	gen_server:start_link({local,idgiver}, idgiver, [], []).
+    net_kernel:start([?MOD, shortnames]),
+    gen_server:start_link({local,idgiver}, idgiver, [], []).
 
 handle_call({get}, From, Counter) ->
 	Reply = Counter + crypto:rand_uniform(0, 19401940194) * 27852785, 
