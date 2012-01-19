@@ -7,12 +7,11 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
 		code_change/3]).
 -export([get/0]).
-
 init(Mode) ->
     case Mode of
 	sequential->
 	    crypto:start(),
-	    {ok, {sequential, 0}};
+	    {ok, {sequential, crypto:rand_uniform(0, 10000)}};
 	random->
 	    crypto:start(),
 	    {ok, {random, sets:new()}}
@@ -35,7 +34,7 @@ host_name() ->
     X.
 
 rand() ->
-    crypto:rand_uniform(0, 27852785).
+    crypto:rand_uniform(20, 27852785).
 
 get_random_not_in_set(Set, X) ->
     case sets:is_element(X, Set) of
@@ -49,23 +48,16 @@ get_random_not_in_set(Set) ->
     get_random_not_in_set(Set, rand()).
 
 handle_call({get}, From, {Mode, State}) ->
-    case Mode of
+   case Mode of
 	random->
 	    X = get_random_not_in_set(State),
 	    {reply, X, {Mode, sets:add_element(X, State)}};
 	sequential->
-	    Reply = State, 
-	    case State rem 2 of 
-		0 -> proc_lib:spawn_link(fun() -> 
-						 timer:sleep(4000), 
-						 gen_server:reply(From, Reply)
-					 end);
-		1 -> proc_lib:spawn_link(fun() -> 
-						 timer:sleep(2000),
-						 gen_server:reply(From, Reply)
-					 end)
-	    end,
-	    {noreply, {Mode, State + 1}}	
+	   proc_lib:spawn_link(fun() -> 
+				   %    timer:sleep(4000), 
+				       gen_server:reply(From, State)
+      end),
+	    {noreply, {Mode, State + 1}}	   
     end.
 
 handle_cast(_Msg, State) -> {noreply, State}.
@@ -76,4 +68,3 @@ code_change(_,State,_) -> {ok, State}.
 
 get() ->
     gen_server:call({idgiver3,list_to_atom("idgiver3@" ++ host_name())}, {get}).
-
